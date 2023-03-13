@@ -1,0 +1,46 @@
+.SUFFIXES: .obj
+
+TARGET=win.xpl sbfetch_test.exe
+
+HEADERS=$(wildcard *.h)
+OBJECTS=tlasxp.o log_msg.o tlasxp_http_get.o tlasxp_ofp_get_parse.o
+SDK=../SDK
+PLUGDIR=/e/X-Plane-12/Resources/plugins/toliss_asxp
+
+CC=x86_64-w64-mingw32-gcc
+LD=x86_64-w64-mingw32-gcc
+
+CFLAGS+=-g0 -O2 -s -Wall -fdiagnostics-color -Wno-format-overflow -DWINDOWS -DWIN32 \
+	-I$(SDK)/CHeaders/XPLM -I$(SDK)/CHeaders/Widgets -DIBM=1 -DUPLOAD_ASXP \
+    -DXPLM200 -DXPLM210 -DXPLM300 -DXPLM301 $(DEFINES)
+
+CFLAGS_DLL=$(CFLAGS) -mdll
+
+LDFLAGS=-shared -static-libgcc -static -lpthread
+LIBS=-L$(SDK)/Libraries/Win -lXPLM_64 -lXPWidgets_64 -lwinhttp
+
+
+all: $(TARGET)
+
+.c.o: $(HEADERS)
+	$(CC) $(CFLAGS_DLL) -c $<
+
+sbfetch_test.exe: sbfetch_test.c tlasxp_http_get.c tlasxp_ofp_get_parse.c log_msg.c $(HEADERS)
+	$(CC) $(CFLAGS) -DLOCAL_DEBUGSTRING -o sbfetch_test.exe \
+        sbfetch_test.c tlasxp_http_get.c tlasxp_ofp_get_parse.c log_msg.c  -lwinhttp
+
+win.xpl: $(OBJECTS)
+	$(LD) -o $@ $(LDFLAGS) $(OBJECTS) $(LIBS)
+
+clean:
+	rm -f $(OBJECTS) $(TARGET)
+
+# install the just compiled target
+install: $(TARGET)
+	mkdir -p "$(PLUGDIR)/64"
+	cp -p win.xpl "$(PLUGDIR)/64"
+
+# create the whole plugin directory
+plugin: $(TARGET)
+	mkdir -p "$(PLUGDIR)/64"
+	cp -p win.xpl "$(PLUGDIR)/64"

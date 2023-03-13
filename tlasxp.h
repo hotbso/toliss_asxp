@@ -1,0 +1,60 @@
+/*
+MIT License
+
+Copyright (c) 2019, 2023 Holger Teutsch
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include <stdio.h>
+#include <stdarg.h>
+
+typedef struct _ofp_info
+{
+    int valid;
+    char units[10];
+    char status[100];
+    char icao_airline[6];
+    char flight_number[10];
+    char aircraft_icao[10];
+    char origin[10];
+    char origin_rwy[6];
+    char destination[10];
+    char alternate[10];
+    char destination_rwy[10];
+    char altitude[10];
+    char tropopause[10];
+    char isa_dev[10];
+    char wind_component[10];
+    char route[1000];
+    char alt_route[1000];
+    char sb_path[200];
+    char sb_fms_link[80];
+    char time_generated[11];
+    char est_time_enroute[11];
+} ofp_info_t;
+
+/* tmpfile is unreliable on windows so we use this as filename */
+extern char tlasxp_tmp_fn[];
+
+extern int tlasxp_http_get(const char *url, FILE *f, int *retlen, int timeout);
+extern void log_msg(const char *fmt, ...);
+extern int tlasxp_ofp_get_parse(const char *pilot_id, ofp_info_t *ofp_info);
+extern void tlasxp_dump_ofp_info(ofp_info_t *ofp_info);
+extern int get_clipboard(char *buffer, int buflen);
